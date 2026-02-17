@@ -7,6 +7,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <cmath>
 
 #include "graphics/Shader.h"
 #include "simulation/Boid.h"
@@ -15,14 +16,40 @@ static void framebuffer_size_callback(GLFWwindow*, int w, int h) {
     glViewport(0, 0, w, h);
 }
 
-static float clampLen(glm::vec2& v, float maxLen) {
-    float len2 = glm::dot(v, v);
-    if (len2 > maxLen * maxLen) {
-        float inv = maxLen / std::sqrt(len2);
-        v *= inv;
-        return maxLen;
-    }
-    return std::sqrt(len2);
+static glm::vec2 safeNormalize(const glm::vec2 &v)
+{
+    float s2 = glm::dot(v, v);
+    if (s2 < 1e-8f)
+        return {1.0f, 0.0f};
+    return v / std::sqrt(s2);
+}
+
+static glm::vec2 limitVec(const glm::vec2 &v, float maxLen)
+{
+    float s2 = glm::dot(v, v);
+    if (s2 > maxLen * maxLen)
+        return v * (maxLen / std::sqrt(s2));
+    return v;
+}
+
+// "Steering" force: desired velocity minus current velocity, force-capped
+static glm::vec2 steerTowards(const glm::vec2 &desiredVel, const glm::vec2 &currentVel, float maxForce)
+{
+    return limitVec(desiredVel - currentVel, maxForce);
+}
+
+// With wrap-around, use the shortest displacement on a torus ("minimum image")
+static glm::vec2 torusDelta(glm::vec2 d, float W, float H)
+{
+    if (d.x > W * 0.5f)
+        d.x -= W;
+    if (d.x < -W * 0.5f)
+        d.x += W;
+    if (d.y > H * 0.5f)
+        d.y -= H;
+    if (d.y < -H * 0.5f)
+        d.y += H;
+    return d;
 }
 
 int main() {
@@ -98,7 +125,7 @@ int main() {
     glBindVertexArray(0);
 
     // ---- Boids initial state ----
-    const int N = 1000;
+    const int N = 100;
     std::vector<Boid> boids;
     boids.reserve(N);
 
@@ -124,8 +151,22 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    const float maxSpeed = 160.0f; // px/s (used even in drift)
-    const float boidSize = 8.0f;   // px
+    // ---- Boids parameters (units: px, s) ----
+    float rSep = 18.0f; // separation radius (px)
+    float rAli = 45.0f; // alignment radius (px)
+    float rCoh = 55.0f; // cohesion radius (px)
+
+    float wSep = 1.6f; // separation weight
+    float wAli = 1.0f; // alignment weight
+    float wCoh = 0.8f; // cohesion weight
+
+    float maxSpeed = 180.0f; // px/s
+    float maxForce = 220.0f; // px/s^2 (acceleration cap; very important for stability)
+
+    const float boidSize = 8.0f; // px
+
+    // We'll store next velocities here (avoid read/write conflicts inside the loop)
+    std::vector<glm::vec2> newVel(boids.size());
 
     while (!glfwWindowShouldClose(window)) {
         double now = glfwGetTime();
@@ -139,20 +180,110 @@ int main() {
         glfwPollEvents();
 
         // ---- Update (temporary: simple drift + wrap) ----
-        for (auto& b : boids) {
-            // Integrate: x(t+dt) = x + v*dt
-            b.pos += b.vel * dt;
+        if (newVel.size() != boids.size())
+            newVel.resize(boids.size());
+
+        for (size_t i = 0; i < boids.size(); ++i)
+        {
+            const Boid &bi = boids[i];
+
+            glm::vec2 sep(0.0f);
+            glm::vec2 aliSum(0.0f);
+            glm::vec2 cohSum(0.0f);
+
+            int sepCount = 0;
+            int aliCount = 0;
+            int cohCount = 0;
+
+            for (size_t j = 0; j < boids.size(); ++j)
+            {
+                if (j == i)
+                    continue;
+                const Boid &bj = boids[j];
+
+                glm::vec2 d = bj.pos - bi.pos;
+                d = torusDelta(d, (float)W, (float)H);
+
+                float dist2 = glm::dot(d, d);
+                if (dist2 < 1e-8f)
+                    continue;
+
+                float dist = std::sqrt(dist2);
+
+                if (dist < rSep)
+                {
+                    // Separation: push away. We use 1/(dist^2 + eps) to avoid singularities.
+                    // Direction should be away from neighbor: -(d).
+                    sep += (-d) / (dist2 + 25.0f);
+                    sepCount++;
+                }
+                if (dist < rAli)
+                {
+                    aliSum += bj.vel;
+                    aliCount++;
+                }
+                if (dist < rCoh)
+                {
+                    // Cohesion: accumulate neighbor positions in torus-consistent coordinates.
+                    cohSum += (bi.pos + d); // bj.pos "unwrapped" relative to bi
+                    cohCount++;
+                }
+            }
+
+            glm::vec2 acc(0.0f);
+
+            // Separation steering
+            if (sepCount > 0)
+            {
+                glm::vec2 desired = safeNormalize(sep) * maxSpeed;
+                acc += wSep * steerTowards(desired, bi.vel, maxForce);
+            }
+
+            // Alignment steering
+            if (aliCount > 0)
+            {
+                glm::vec2 avgVel = aliSum / (float)aliCount;
+                glm::vec2 desired = safeNormalize(avgVel) * maxSpeed;
+                acc += wAli * steerTowards(desired, bi.vel, maxForce);
+            }
+
+            // Cohesion steering
+            if (cohCount > 0)
+            {
+                glm::vec2 center = cohSum / (float)cohCount;
+                glm::vec2 toCenter = center - bi.pos;
+                toCenter = torusDelta(toCenter, (float)W, (float)H);
+
+                glm::vec2 desired = safeNormalize(toCenter) * maxSpeed;
+                acc += wCoh * steerTowards(desired, bi.vel, maxForce);
+            }
+
+            // Final acceleration cap (prevents blow-ups)
+            acc = limitVec(acc, maxForce);
+
+            // Semi-implicit Euler:
+            // v_{t+dt} = v_t + a*dt
+            // x_{t+dt} = x_t + v_{t+dt}*dt
+            glm::vec2 vNext = bi.vel + acc * dt;
+            vNext = limitVec(vNext, maxSpeed);
+            newVel[i] = vNext;
+        }
+
+        // Apply vNext and integrate positions
+        for (size_t i = 0; i < boids.size(); ++i)
+        {
+            boids[i].vel = newVel[i];
+            boids[i].pos += boids[i].vel * dt;
 
             // Wrap boundaries
-            if (b.pos.x < 0) b.pos.x += W;
-            if (b.pos.x >= W) b.pos.x -= W;
-            if (b.pos.y < 0) b.pos.y += H;
-            if (b.pos.y >= H) b.pos.y -= H;
-
-            // Keep speed bounded (important later too)
-            glm::vec2 v = b.vel;
-            clampLen(v, maxSpeed);
-            b.vel = v;
+            if (boids[i].pos.x < 0)
+                boids[i].pos.x += W;
+            if (boids[i].pos.x >= W)
+                boids[i].pos.x -= W;
+            if (boids[i].pos.y < 0)
+                boids[i].pos.y += H;
+            if (boids[i].pos.y >= H)
+                boids[i].pos.y -= H;
         }
 
         // ---- Upload instance data ----
