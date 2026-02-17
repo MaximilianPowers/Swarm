@@ -1,0 +1,14 @@
+# ninja log v6
+6	50	7930354079129951	CMakeFiles/Swarm.dir/src/core/Application.cpp.obj	72846ac6992a70d9
+11	668	7930354079169956	CMakeFiles/Swarm.dir/src/core/Shader.cpp.obj	a427052c46a97b28
+14	52	7930354079209973	CMakeFiles/Swarm.dir/src/graphics/Renderer.cpp.obj	c27b55eda945fd06
+21	64	7930354079279969	CMakeFiles/Swarm.dir/src/simulation/Boid.cpp.obj	619012baaa51a13b
+25	65	7930354079319988	CMakeFiles/Swarm.dir/src/simulation/Flock.cpp.obj	549c2e0a72f44f4d
+18	48	7930356222988972	C:/Users/Max/Documents/Swarm/build/CMakeFiles/cmake.verify_globs	bcaf4ee05750a1fe
+51	692	7930356223308974	CMakeFiles/Swarm.dir/src/graphics/Shader.cpp.obj	c2366bd64ff92eca
+54	1069	7930356223348971	CMakeFiles/Swarm.dir/src/main.cpp.obj	faf34f38caa6a5b0
+1071	2637	7930356233519254	Swarm.exe	ac408bf008b00a74
+24	43	7930356275635826	C:/Users/Max/Documents/Swarm/build/CMakeFiles/cmake.verify_globs	bcaf4ee05750a1fe
+16	37	7930356607713361	C:/Users/Max/Documents/Swarm/build/CMakeFiles/cmake.verify_globs	bcaf4ee05750a1fe
+16	36	7930357201770008	C:/Users/Max/Documents/Swarm/build/CMakeFiles/cmake.verify_globs	bcaf4ee05750a1fe
+19	38	7930358327604328	C:/Users/Max/Documents/Swarm/build/CMakeFiles/cmake.verify_globs	bcaf4ee05750a1fe

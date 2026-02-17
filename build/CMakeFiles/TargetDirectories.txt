@@ -1,0 +1,3 @@
+C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir
+C:/Users/Max/Documents/Swarm/build/CMakeFiles/edit_cache.dir
+C:/Users/Max/Documents/Swarm/build/CMakeFiles/rebuild_cache.dir

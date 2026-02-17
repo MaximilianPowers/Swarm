@@ -1,0 +1,7 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Ninja",
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/Max/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    }
+}
