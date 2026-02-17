@@ -8,6 +8,8 @@
 #include <random>
 #include <vector>
 #include <cmath>
+#include <algorithm>
+#include <iomanip>
 
 #include "graphics/Shader.h"
 #include "simulation/Boid.h"
@@ -50,6 +52,71 @@ static glm::vec2 torusDelta(glm::vec2 d, float W, float H)
     if (d.y < -H * 0.5f)
         d.y += H;
     return d;
+}
+
+static int wrapIndex(int i, int n)
+{
+    i %= n;
+    if (i < 0)
+        i += n;
+    return i;
+}
+
+static int cellIndexFromPos(float x, float y, float cellSize, int cols, int rows)
+{
+    int cx = (int)std::floor(x / cellSize);
+    int cy = (int)std::floor(y / cellSize);
+    cx = wrapIndex(cx, cols);
+    cy = wrapIndex(cy, rows);
+    return cy * cols + cx;
+}
+
+struct Controls
+{
+    bool paused = false;
+    bool stepOnce = false;
+
+    float rSepStep = 2.0f;
+    float rAliStep = 2.0f;
+    float rCohStep = 2.0f;
+
+    float wStep = 0.1f;
+    float speedStep = 10.0f;
+    float forceStep = 20.0f;
+
+    double lastPrint = 0.0;
+};
+
+static bool keyPressed(GLFWwindow *window, int key)
+{
+    return glfwGetKey(window, key) == GLFW_PRESS;
+}
+
+static bool keyJustPressed(GLFWwindow *window, int key, bool &prevDown)
+{
+    bool down = keyPressed(window, key);
+    bool jp = down && !prevDown;
+    prevDown = down;
+    return jp;
+}
+
+static void printParams(double now,
+                        float rSep, float rAli, float rCoh,
+                        float wSep, float wAli, float wCoh,
+                        float maxSpeed, float maxForce)
+{
+    // Rate-limit console spam
+    // Prints at most ~4 times per second.
+    static double last = 0.0;
+    if (now - last < 0.25)
+        return;
+    last = now;
+
+    std::cout << std::fixed << std::setprecision(2)
+              << "[params] rSep=" << rSep << " rAli=" << rAli << " rCoh=" << rCoh
+              << " | wSep=" << wSep << " wAli=" << wAli << " wCoh=" << wCoh
+              << " | maxSpeed=" << maxSpeed << " maxForce=" << maxForce
+              << "\n";
 }
 
 int main() {
@@ -125,7 +192,7 @@ int main() {
     glBindVertexArray(0);
 
     // ---- Boids initial state ----
-    const int N = 100;
+    const int N = 1'000;
     std::vector<Boid> boids;
     boids.reserve(N);
 
@@ -168,6 +235,29 @@ int main() {
     // We'll store next velocities here (avoid read/write conflicts inside the loop)
     std::vector<glm::vec2> newVel(boids.size());
 
+    Controls controls;
+
+    // Track key edge transitions (just-pressed logic)
+    bool prevP = false, prevO = false, prevR = false;
+    bool prev1 = false, prev2 = false, prev3 = false;
+    bool prevQ = false, prevW = false, prevE = false;
+    bool prevA = false, prevS = false, prevD = false;
+    bool prevZ = false, prevX = false, prevC = false;
+    bool prevUp = false, prevDown = false, prevLeft = false, prevRight = false;
+
+    // ---- Uniform grid (spatial hash) ----
+    // Choose cellSize >= max interaction radius so we only check neighboring 3x3 cells.
+    float cellSize = std::max(rSep, std::max(rAli, rCoh));
+
+    // Grid dimensions
+    int gridCols = std::max(1, (int)std::ceil(W / cellSize));
+    int gridRows = std::max(1, (int)std::ceil(H / cellSize));
+
+    // Linked-list-in-arrays grid (no per-frame allocations):
+    // head[cell] is the first boid index in that cell, next[i] is the next boid in same cell.
+    std::vector<int> head(gridCols * gridRows, -1);
+    std::vector<int> next((int)boids.size(), -1);
+
     while (!glfwWindowShouldClose(window)) {
         double now = glfwGetTime();
         float dt = float(now - last);
@@ -180,110 +270,233 @@ int main() {
         glfwPollEvents();
 
         // ---- Update (temporary: simple drift + wrap) ----
-        if (newVel.size() != boids.size())
-            newVel.resize(boids.size());
-
-        for (size_t i = 0; i < boids.size(); ++i)
+        // ---- Update (boids via uniform grid) ----
+        // ---- Controls ----
+        // Toggle pause
+        if (keyJustPressed(window, GLFW_KEY_P, prevP))
         {
-            const Boid &bi = boids[i];
-
-            glm::vec2 sep(0.0f);
-            glm::vec2 aliSum(0.0f);
-            glm::vec2 cohSum(0.0f);
-
-            int sepCount = 0;
-            int aliCount = 0;
-            int cohCount = 0;
-
-            for (size_t j = 0; j < boids.size(); ++j)
-            {
-                if (j == i)
-                    continue;
-                const Boid &bj = boids[j];
-
-                glm::vec2 d = bj.pos - bi.pos;
-                d = torusDelta(d, (float)W, (float)H);
-
-                float dist2 = glm::dot(d, d);
-                if (dist2 < 1e-8f)
-                    continue;
-
-                float dist = std::sqrt(dist2);
-
-                if (dist < rSep)
-                {
-                    // Separation: push away. We use 1/(dist^2 + eps) to avoid singularities.
-                    // Direction should be away from neighbor: -(d).
-                    sep += (-d) / (dist2 + 25.0f);
-                    sepCount++;
-                }
-                if (dist < rAli)
-                {
-                    aliSum += bj.vel;
-                    aliCount++;
-                }
-                if (dist < rCoh)
-                {
-                    // Cohesion: accumulate neighbor positions in torus-consistent coordinates.
-                    cohSum += (bi.pos + d); // bj.pos "unwrapped" relative to bi
-                    cohCount++;
-                }
-            }
-
-            glm::vec2 acc(0.0f);
-
-            // Separation steering
-            if (sepCount > 0)
-            {
-                glm::vec2 desired = safeNormalize(sep) * maxSpeed;
-                acc += wSep * steerTowards(desired, bi.vel, maxForce);
-            }
-
-            // Alignment steering
-            if (aliCount > 0)
-            {
-                glm::vec2 avgVel = aliSum / (float)aliCount;
-                glm::vec2 desired = safeNormalize(avgVel) * maxSpeed;
-                acc += wAli * steerTowards(desired, bi.vel, maxForce);
-            }
-
-            // Cohesion steering
-            if (cohCount > 0)
-            {
-                glm::vec2 center = cohSum / (float)cohCount;
-                glm::vec2 toCenter = center - bi.pos;
-                toCenter = torusDelta(toCenter, (float)W, (float)H);
-
-                glm::vec2 desired = safeNormalize(toCenter) * maxSpeed;
-                acc += wCoh * steerTowards(desired, bi.vel, maxForce);
-            }
-
-            // Final acceleration cap (prevents blow-ups)
-            acc = limitVec(acc, maxForce);
-
-            // Semi-implicit Euler:
-            // v_{t+dt} = v_t + a*dt
-            // x_{t+dt} = x_t + v_{t+dt}*dt
-            glm::vec2 vNext = bi.vel + acc * dt;
-            vNext = limitVec(vNext, maxSpeed);
-            newVel[i] = vNext;
+            controls.paused = !controls.paused;
+            std::cout << (controls.paused ? "[control] paused\n" : "[control] resumed\n");
         }
 
-        // Apply vNext and integrate positions
-        for (size_t i = 0; i < boids.size(); ++i)
+        // Step one frame when paused
+        if (keyJustPressed(window, GLFW_KEY_O, prevO))
         {
-            boids[i].vel = newVel[i];
-            boids[i].pos += boids[i].vel * dt;
+            controls.stepOnce = true;
+            std::cout << "[control] step once\n";
+        }
 
-            // Wrap boundaries
-            if (boids[i].pos.x < 0)
-                boids[i].pos.x += W;
-            if (boids[i].pos.x >= W)
-                boids[i].pos.x -= W;
-            if (boids[i].pos.y < 0)
-                boids[i].pos.y += H;
-            if (boids[i].pos.y >= H)
-                boids[i].pos.y -= H;
+        // Reset boids (re-randomize)
+        if (keyJustPressed(window, GLFW_KEY_R, prevR))
+        {
+            for (auto &b : boids)
+            {
+                b.pos = {rx(rng), ry(rng)};
+                glm::vec2 v(rv(rng), rv(rng));
+                v = safeNormalize(v);
+                b.vel = v * (0.7f * maxSpeed);
+            }
+            std::cout << "[control] reset boids\n";
+        }
+
+        // Radii (1/2/3 decrease, Q/W/E increase)
+        if (keyJustPressed(window, GLFW_KEY_1, prev1))
+            rSep = std::max(2.0f, rSep - controls.rSepStep);
+        if (keyJustPressed(window, GLFW_KEY_Q, prevQ))
+            rSep += controls.rSepStep;
+
+        if (keyJustPressed(window, GLFW_KEY_2, prev2))
+            rAli = std::max(2.0f, rAli - controls.rAliStep);
+        if (keyJustPressed(window, GLFW_KEY_W, prevW))
+            rAli += controls.rAliStep;
+
+        if (keyJustPressed(window, GLFW_KEY_3, prev3))
+            rCoh = std::max(2.0f, rCoh - controls.rCohStep);
+        if (keyJustPressed(window, GLFW_KEY_E, prevE))
+            rCoh += controls.rCohStep;
+
+        // Weights (A/S/D decrease, Z/X/C increase)
+        if (keyJustPressed(window, GLFW_KEY_A, prevA))
+            wSep = std::max(0.0f, wSep - controls.wStep);
+        if (keyJustPressed(window, GLFW_KEY_Z, prevZ))
+            wSep += controls.wStep;
+
+        if (keyJustPressed(window, GLFW_KEY_S, prevS))
+            wAli = std::max(0.0f, wAli - controls.wStep);
+        if (keyJustPressed(window, GLFW_KEY_X, prevX))
+            wAli += controls.wStep;
+
+        if (keyJustPressed(window, GLFW_KEY_D, prevD))
+            wCoh = std::max(0.0f, wCoh - controls.wStep);
+        if (keyJustPressed(window, GLFW_KEY_C, prevC))
+            wCoh += controls.wStep;
+
+        // Speed/force (arrow keys)
+        if (keyJustPressed(window, GLFW_KEY_UP, prevUp))
+            maxSpeed += controls.speedStep;
+        if (keyJustPressed(window, GLFW_KEY_DOWN, prevDown))
+            maxSpeed = std::max(10.0f, maxSpeed - controls.speedStep);
+
+        if (keyJustPressed(window, GLFW_KEY_RIGHT, prevRight))
+            maxForce += controls.forceStep;
+        if (keyJustPressed(window, GLFW_KEY_LEFT, prevLeft))
+            maxForce = std::max(10.0f, maxForce - controls.forceStep);
+
+        // Print params if anything was changed this frame (simple heuristic):
+        // We just print every frame you press a key; rate-limited in printParams.
+        if (keyPressed(window, GLFW_KEY_1) || keyPressed(window, GLFW_KEY_2) || keyPressed(window, GLFW_KEY_3) ||
+            keyPressed(window, GLFW_KEY_Q) || keyPressed(window, GLFW_KEY_W) || keyPressed(window, GLFW_KEY_E) ||
+            keyPressed(window, GLFW_KEY_A) || keyPressed(window, GLFW_KEY_S) || keyPressed(window, GLFW_KEY_D) ||
+            keyPressed(window, GLFW_KEY_Z) || keyPressed(window, GLFW_KEY_X) || keyPressed(window, GLFW_KEY_C) ||
+            keyPressed(window, GLFW_KEY_UP) || keyPressed(window, GLFW_KEY_DOWN) ||
+            keyPressed(window, GLFW_KEY_LEFT) || keyPressed(window, GLFW_KEY_RIGHT))
+        {
+            printParams(now, rSep, rAli, rCoh, wSep, wAli, wCoh, maxSpeed, maxForce);
+        }
+
+        bool doSim = !controls.paused || controls.stepOnce;
+
+        if (doSim) {    // Keep newVel sized correctly
+            controls.stepOnce = false; // reset stepOnce (if we were stepping)
+
+            if (newVel.size() != boids.size())
+                newVel.resize(boids.size());
+
+            // If you later change radii interactively, recompute these each frame.
+            // For now they’re constant, but this keeps it correct if you tweak values:
+            cellSize = std::max(rSep, std::max(rAli, rCoh));
+            gridCols = std::max(1, (int)std::ceil(W / cellSize));
+            gridRows = std::max(1, (int)std::ceil(H / cellSize));
+
+            // Resize arrays only if needed (rare)
+            if ((int)head.size() != gridCols * gridRows)
+                head.assign(gridCols * gridRows, -1);
+            else
+                std::fill(head.begin(), head.end(), -1);
+
+            if ((int)next.size() != (int)boids.size())
+                next.assign((int)boids.size(), -1);
+            else
+                std::fill(next.begin(), next.end(), -1);
+
+
+            // 1) Build grid: insert each boid into a cell
+            for (int i = 0; i < (int)boids.size(); ++i)
+            {
+                const auto &b = boids[i];
+                int cell = cellIndexFromPos(b.pos.x, b.pos.y, cellSize, gridCols, gridRows);
+
+                // Insert i at head of linked list for this cell
+                next[i] = head[cell];
+                head[cell] = i;
+            }
+
+            // 2) Compute new velocities using only nearby cells (3x3 neighborhood)
+            for (int i = 0; i < (int)boids.size(); ++i)
+            {
+                const Boid &bi = boids[i];
+
+                glm::vec2 sep(0.0f);
+                glm::vec2 aliSum(0.0f);
+                glm::vec2 cohSum(0.0f);
+
+                int sepCount = 0;
+                int aliCount = 0;
+                int cohCount = 0;
+
+                int cx = wrapIndex((int)std::floor(bi.pos.x / cellSize), gridCols);
+                int cy = wrapIndex((int)std::floor(bi.pos.y / cellSize), gridRows);
+
+                // Scan adjacent cells
+                for (int dy = -1; dy <= 1; ++dy)
+                {
+                    for (int dx = -1; dx <= 1; ++dx)
+                    {
+                        int nx = wrapIndex(cx + dx, gridCols);
+                        int ny = wrapIndex(cy + dy, gridRows);
+                        int nCell = ny * gridCols + nx;
+
+                        for (int j = head[nCell]; j != -1; j = next[j])
+                        {
+                            if (j == i)
+                                continue;
+                            const Boid &bj = boids[j];
+
+                            glm::vec2 d = bj.pos - bi.pos;
+                            d = torusDelta(d, (float)W, (float)H);
+
+                            float dist2 = glm::dot(d, d);
+                            if (dist2 < 1e-8f)
+                                continue;
+                            float dist = std::sqrt(dist2);
+
+                            if (dist < rSep)
+                            {
+                                sep += (-d) / (dist2 + 25.0f); // soften singularity
+                                sepCount++;
+                            }
+                            if (dist < rAli)
+                            {
+                                aliSum += bj.vel;
+                                aliCount++;
+                            }
+                            if (dist < rCoh)
+                            {
+                                cohSum += (bi.pos + d); // torus-consistent neighbor position
+                                cohCount++;
+                            }
+                        }
+                    }
+                }
+
+                glm::vec2 acc(0.0f);
+
+                if (sepCount > 0)
+                {
+                    glm::vec2 desired = safeNormalize(sep) * maxSpeed;
+                    acc += wSep * steerTowards(desired, bi.vel, maxForce);
+                }
+                if (aliCount > 0)
+                {
+                    glm::vec2 avgVel = aliSum / (float)aliCount;
+                    glm::vec2 desired = safeNormalize(avgVel) * maxSpeed;
+                    acc += wAli * steerTowards(desired, bi.vel, maxForce);
+                }
+                if (cohCount > 0)
+                {
+                    glm::vec2 center = cohSum / (float)cohCount;
+                    glm::vec2 toCenter = center - bi.pos;
+                    toCenter = torusDelta(toCenter, (float)W, (float)H);
+
+                    glm::vec2 desired = safeNormalize(toCenter) * maxSpeed;
+                    acc += wCoh * steerTowards(desired, bi.vel, maxForce);
+                }
+
+                // Cap acceleration for stability
+                acc = limitVec(acc, maxForce);
+
+                // Semi-implicit Euler
+                glm::vec2 vNext = bi.vel + acc * dt;
+                vNext = limitVec(vNext, maxSpeed);
+                newVel[i] = vNext;
+            }
+
+            // 3) Apply and integrate positions
+            for (int i = 0; i < (int)boids.size(); ++i)
+            {
+                boids[i].vel = newVel[i];
+                boids[i].pos += boids[i].vel * dt;
+
+                // Wrap boundaries
+                if (boids[i].pos.x < 0)
+                    boids[i].pos.x += W;
+                if (boids[i].pos.x >= W)
+                    boids[i].pos.x -= W;
+                if (boids[i].pos.y < 0)
+                    boids[i].pos.y += H;
+                if (boids[i].pos.y >= H)
+                    boids[i].pos.y -= H;
+            }
         }
 
         // ---- Upload instance data ----
