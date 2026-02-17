@@ -10,7 +10,10 @@
 #include <cmath>
 #include <algorithm>
 #include <iomanip>
+#include <numeric>
 
+#include <imgui.h>
+#include "ui/ImGuiLayer.h"
 #include "graphics/Shader.h"
 #include "simulation/Boid.h"
 
@@ -70,6 +73,17 @@ static int cellIndexFromPos(float x, float y, float cellSize, int cols, int rows
     cy = wrapIndex(cy, rows);
     return cy * cols + cx;
 }
+
+
+struct BoidStats
+{
+    float avgNeighborsAli = 0.0f; // within rAli
+    float avgNeighborsSep = 0.0f; // within rSep
+    float meanSpeed = 0.0f;
+    float stdSpeed = 0.0f;
+    float alignmentPhi = 0.0f; // order parameter in [0,1]
+    float meanCellOcc = 0.0f;  // mean occupancy among non-empty cells
+};
 
 struct Controls
 {
@@ -133,6 +147,12 @@ int main() {
     const int W = 1280;
     const int H = 720;
 
+    // Fixed UI panel width (pixels) on the right
+    const int UI_W = 420;
+
+    // Simulation/render area is everything left of the UI panel
+    const int SIM_W = W - UI_W;
+
     GLFWwindow* window = glfwCreateWindow(W, H, "Swarm", nullptr, nullptr);
     if (!window) {
         std::cerr << "Window create failed\n";
@@ -150,6 +170,7 @@ int main() {
     }
 
     std::cout << "OpenGL: " << glGetString(GL_VERSION) << "\n";
+    ImGuiLayer::Init(window, "#version 330");
 
     // ---- Shaders ----
     Shader shader("assets/shaders/boid.vert", "assets/shaders/boid.frag");
@@ -197,7 +218,7 @@ int main() {
     boids.reserve(N);
 
     std::mt19937 rng(12345);
-    std::uniform_real_distribution<float> rx(0.0f, float(W));
+    std::uniform_real_distribution<float> rx(0.0f, float(SIM_W));
     std::uniform_real_distribution<float> ry(0.0f, float(H));
     std::uniform_real_distribution<float> rv(-1.0f, 1.0f);
 
@@ -209,7 +230,7 @@ int main() {
     }
 
     // ---- Camera: orthographic pixels -> NDC ----
-    glm::mat4 vp = glm::ortho(0.0f, float(W), 0.0f, float(H), -1.0f, 1.0f);
+    glm::mat4 vp = glm::ortho(0.0f, float(SIM_W), 0.0f, float(H), -1.0f, 1.0f);
 
     // ---- Timing ----
     double last = glfwGetTime();
@@ -218,17 +239,29 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    // ---- Boids parameters (units: px, s) ----
-    float rSep = 18.0f; // separation radius (px)
-    float rAli = 45.0f; // alignment radius (px)
-    float rCoh = 55.0f; // cohesion radius (px)
+    // ---- Default parameters ----
+    const float DEFAULT_rSep = 18.0f;
+    const float DEFAULT_rAli = 45.0f;
+    const float DEFAULT_rCoh = 55.0f;
 
-    float wSep = 1.6f; // separation weight
-    float wAli = 1.0f; // alignment weight
-    float wCoh = 0.8f; // cohesion weight
+    const float DEFAULT_wSep = 1.6f;
+    const float DEFAULT_wAli = 1.0f;
+    const float DEFAULT_wCoh = 0.8f;
 
-    float maxSpeed = 180.0f; // px/s
-    float maxForce = 220.0f; // px/s^2 (acceleration cap; very important for stability)
+    const float DEFAULT_maxSpeed = 180.0f;
+    const float DEFAULT_maxForce = 220.0f;
+
+    // ---- Active parameters (modifiable via UI) ----
+    float rSep = DEFAULT_rSep;
+    float rAli = DEFAULT_rAli;
+    float rCoh = DEFAULT_rCoh;
+
+    float wSep = DEFAULT_wSep;
+    float wAli = DEFAULT_wAli;
+    float wCoh = DEFAULT_wCoh;
+
+    float maxSpeed = DEFAULT_maxSpeed;
+    float maxForce = DEFAULT_maxForce;
 
     const float boidSize = 8.0f; // px
 
@@ -250,7 +283,7 @@ int main() {
     float cellSize = std::max(rSep, std::max(rAli, rCoh));
 
     // Grid dimensions
-    int gridCols = std::max(1, (int)std::ceil(W / cellSize));
+    int gridCols = std::max(1, (int)std::ceil(SIM_W / cellSize));
     int gridRows = std::max(1, (int)std::ceil(H / cellSize));
 
     // Linked-list-in-arrays grid (no per-frame allocations):
@@ -258,6 +291,47 @@ int main() {
     std::vector<int> head(gridCols * gridRows, -1);
     std::vector<int> next((int)boids.size(), -1);
 
+    BoidStats stats;
+
+    // Full-history storage (since simulation start)
+    std::vector<float> h_avgNeiAli;
+    std::vector<float> h_meanSpeed;
+    std::vector<float> h_alignment;
+    std::vector<float> h_closeSep;
+    std::vector<float> h_cellOcc;
+
+    // Optional: reserve to avoid frequent reallocs
+    h_avgNeiAli.reserve(10000);
+    h_meanSpeed.reserve(10000);
+    h_alignment.reserve(10000);
+    h_closeSep.reserve(10000);
+    h_cellOcc.reserve(10000);
+
+    auto resetSimulationAndPlots = [&]()
+    {
+        // Reset boids
+        for (auto &b : boids)
+        {
+            b.pos = {rx(rng), ry(rng)};
+            glm::vec2 v(rv(rng), rv(rng));
+            v = safeNormalize(v);
+            b.vel = v * (0.7f * maxSpeed);
+        }
+
+        // Reset stats (optional, but keeps dashboard clean)
+        stats = BoidStats{};
+
+        // Reset plots (full-history vectors)
+        h_avgNeiAli.clear();
+        h_meanSpeed.clear();
+        h_alignment.clear();
+        h_closeSep.clear();
+        h_cellOcc.clear();
+    };
+
+    // contiguous scratch buffers for plotting
+    std::vector<float> plotBuf1, plotBuf2, plotBuf3, plotBuf4, plotBuf5;
+    
     while (!glfwWindowShouldClose(window)) {
         double now = glfwGetTime();
         float dt = float(now - last);
@@ -268,9 +342,131 @@ int main() {
         if (dt > 0.05f) dt = 0.05f;
 
         glfwPollEvents();
+        ImGuiLayer::BeginFrame();
 
-        // ---- Update (temporary: simple drift + wrap) ----
-        // ---- Update (boids via uniform grid) ----
+        // ---- ImGui UI ----
+        // ---- Fixed Right Panel: Controls + Dashboard ----
+        ImGuiIO &io = ImGui::GetIO();
+
+        // Pin panel exactly to right-side reserved area
+        ImGui::SetNextWindowPos(ImVec2((float)SIM_W, 0.0f), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2((float)UI_W, io.DisplaySize.y), ImGuiCond_Always);
+
+        ImGuiWindowFlags panelFlags =
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse;
+
+        ImGui::Begin("Swarm Panel", nullptr, panelFlags);
+
+        if (ImGui::BeginTabBar("RightPanelTabs"))
+        {
+
+            // ---- Controls tab ----
+            if (ImGui::BeginTabItem("Controls"))
+            {
+
+                ImGui::Text("Boids: %d", (int)boids.size());
+                ImGui::Text("FPS: %.1f", io.Framerate);
+
+                ImGui::Separator();
+                ImGui::Text("Radii (px)");
+                ImGui::SliderFloat("Separation radius", &rSep, 2.0f, 120.0f);
+                ImGui::SliderFloat("Alignment radius", &rAli, 2.0f, 200.0f);
+                ImGui::SliderFloat("Cohesion radius", &rCoh, 2.0f, 240.0f);
+
+                ImGui::Separator();
+                ImGui::Text("Weights");
+                ImGui::SliderFloat("Separation weight", &wSep, 0.0f, 5.0f);
+                ImGui::SliderFloat("Alignment weight", &wAli, 0.0f, 5.0f);
+                ImGui::SliderFloat("Cohesion weight", &wCoh, 0.0f, 5.0f);
+
+                ImGui::Separator();
+                ImGui::Text("Caps");
+                ImGui::SliderFloat("Max speed (px/s)", &maxSpeed, 10.0f, 600.0f);
+                ImGui::SliderFloat("Max force (px/s^2)", &maxForce, 10.0f, 1200.0f);
+
+                ImGui::Separator();
+                ImGui::Checkbox("Paused", &controls.paused);
+
+                if (ImGui::Button("Step once"))
+                    controls.stepOnce = true;
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Defaults"))
+                {
+                    rSep = DEFAULT_rSep;
+                    rAli = DEFAULT_rAli;
+                    rCoh = DEFAULT_rCoh;
+                    wSep = DEFAULT_wSep;
+                    wAli = DEFAULT_wAli;
+                    wCoh = DEFAULT_wCoh;
+                    maxSpeed = DEFAULT_maxSpeed;
+                    maxForce = DEFAULT_maxForce;
+                }
+
+                ImGui::SameLine();
+
+                if (ImGui::Button("Reset"))
+                {
+                    resetSimulationAndPlots();
+                }
+
+                ImGui::EndTabItem();
+            }
+
+            // ---- Dashboard tab ----
+            if (ImGui::BeginTabItem("Dashboard"))
+            {
+
+                ImGui::Text("FPS: %.1f", io.Framerate);
+                ImGui::Text("Boids: %d", (int)boids.size());
+                ImGui::Separator();
+
+                ImGui::Text("Avg neighbors (rAli): %.2f", stats.avgNeighborsAli);
+                ImGui::Text("Avg close contacts (rSep): %.2f", stats.avgNeighborsSep);
+                ImGui::Text("Mean speed: %.2f px/s", stats.meanSpeed);
+                ImGui::Text("Speed std: %.2f", stats.stdSpeed);
+                ImGui::Text("Alignment phi: %.3f", stats.alignmentPhi);
+                ImGui::Text("Mean cell occupancy: %.2f", stats.meanCellOcc);
+
+                ImGui::Separator();
+                ImGui::Text("Trends (since reset)");
+
+                if (!h_avgNeiAli.empty())
+                    ImGui::PlotLines("Neighbors (Ali)", h_avgNeiAli.data(), (int)h_avgNeiAli.size(), 0, nullptr, FLT_MIN, FLT_MAX, ImVec2(0, 70));
+                else
+                    ImGui::Text("Neighbors (Ali): (no data)");
+
+                if (!h_closeSep.empty())
+                    ImGui::PlotLines("Close (Sep)", h_closeSep.data(), (int)h_closeSep.size(), 0, nullptr, FLT_MIN, FLT_MAX, ImVec2(0, 70));
+                else
+                    ImGui::Text("Close (Sep): (no data)");
+
+                if (!h_meanSpeed.empty())
+                    ImGui::PlotLines("Mean speed", h_meanSpeed.data(), (int)h_meanSpeed.size(), 0, nullptr, FLT_MIN, FLT_MAX, ImVec2(0, 70));
+                else
+                    ImGui::Text("Mean speed: (no data)");
+
+                if (!h_alignment.empty())
+                    ImGui::PlotLines("Alignment phi", h_alignment.data(), (int)h_alignment.size(), 0, nullptr, 0.0f, 1.0f, ImVec2(0, 70));
+                else
+                    ImGui::Text("Alignment phi: (no data)");
+
+                if (!h_cellOcc.empty())
+                    ImGui::PlotLines("Cell occupancy", h_cellOcc.data(), (int)h_cellOcc.size(), 0, nullptr, FLT_MIN, FLT_MAX, ImVec2(0, 70));
+                else
+                    ImGui::Text("Cell occupancy: (no data)");
+
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+        ImGui::End();
+
         // ---- Controls ----
         // Toggle pause
         if (keyJustPressed(window, GLFW_KEY_P, prevP))
@@ -289,14 +485,8 @@ int main() {
         // Reset boids (re-randomize)
         if (keyJustPressed(window, GLFW_KEY_R, prevR))
         {
-            for (auto &b : boids)
-            {
-                b.pos = {rx(rng), ry(rng)};
-                glm::vec2 v(rv(rng), rv(rng));
-                v = safeNormalize(v);
-                b.vel = v * (0.7f * maxSpeed);
-            }
-            std::cout << "[control] reset boids\n";
+            resetSimulationAndPlots();
+            std::cout << "[control] reset boids + plots\n";
         }
 
         // Radii (1/2/3 decrease, Q/W/E increase)
@@ -379,6 +569,18 @@ int main() {
             else
                 std::fill(next.begin(), next.end(), -1);
 
+            // ---- Stats accumulators (reset each sim step) ----
+            double sumSpeed = 0.0;
+            double sumSpeed2 = 0.0;
+            double sumNeiAli = 0.0;
+            double sumNeiSep = 0.0;
+
+            // alignment order parameter: sum of normalized velocity vectors
+            glm::vec2 sumDir(0.0f, 0.0f);
+
+            // cell occupancy stats (computed after grid build)
+            int nonEmptyCells = 0;
+            int totalInNonEmpty = 0;
 
             // 1) Build grid: insert each boid into a cell
             for (int i = 0; i < (int)boids.size(); ++i)
@@ -390,6 +592,19 @@ int main() {
                 next[i] = head[cell];
                 head[cell] = i;
             }
+
+            // ---- Cell occupancy (density proxy) ----
+            for (int c = 0; c < (int)head.size(); ++c)
+            {
+                if (head[c] == -1)
+                    continue;
+                nonEmptyCells++;
+                int count = 0;
+                for (int j = head[c]; j != -1; j = next[j])
+                    count++;
+                totalInNonEmpty += count;
+            }
+            stats.meanCellOcc = (nonEmptyCells > 0) ? (float)totalInNonEmpty / (float)nonEmptyCells : 0.0f;
 
             // 2) Compute new velocities using only nearby cells (3x3 neighborhood)
             for (int i = 0; i < (int)boids.size(); ++i)
@@ -423,7 +638,7 @@ int main() {
                             const Boid &bj = boids[j];
 
                             glm::vec2 d = bj.pos - bi.pos;
-                            d = torusDelta(d, (float)W, (float)H);
+                            d = torusDelta(d, (float)SIM_W, (float)H);
 
                             float dist2 = glm::dot(d, d);
                             if (dist2 < 1e-8f)
@@ -466,7 +681,7 @@ int main() {
                 {
                     glm::vec2 center = cohSum / (float)cohCount;
                     glm::vec2 toCenter = center - bi.pos;
-                    toCenter = torusDelta(toCenter, (float)W, (float)H);
+                    toCenter = torusDelta(toCenter, (float)SIM_W, (float)H);
 
                     glm::vec2 desired = safeNormalize(toCenter) * maxSpeed;
                     acc += wCoh * steerTowards(desired, bi.vel, maxForce);
@@ -479,7 +694,47 @@ int main() {
                 glm::vec2 vNext = bi.vel + acc * dt;
                 vNext = limitVec(vNext, maxSpeed);
                 newVel[i] = vNext;
+
+                // ---- Stats: speed & alignment ----
+                float speed = std::sqrt(glm::dot(vNext, vNext));
+                sumSpeed += speed;
+                sumSpeed2 += (double)speed * (double)speed;
+
+                // order parameter uses normalized directions
+                glm::vec2 dir = safeNormalize(vNext);
+                sumDir += dir;
+
+                // neighbor counts (already computed)
+                sumNeiAli += aliCount;
+                sumNeiSep += sepCount;
             }
+
+            // ---- Finalize stats (per sim step) ----
+            int Nf = (int)boids.size();
+            if (Nf > 0)
+            {
+                stats.meanSpeed = (float)(sumSpeed / Nf);
+
+                // std = sqrt(E[v^2] - (E[v])^2) (numerically stable enough here)
+                double mean2 = sumSpeed2 / Nf;
+                double mean = sumSpeed / Nf;
+                double var = mean2 - mean * mean;
+                if (var < 0.0)
+                    var = 0.0;
+                stats.stdSpeed = (float)std::sqrt(var);
+
+                stats.avgNeighborsAli = (float)(sumNeiAli / Nf);
+                stats.avgNeighborsSep = (float)(sumNeiSep / Nf);
+
+                // alignment phi in [0,1]
+                stats.alignmentPhi = (float)(std::sqrt(glm::dot(sumDir, sumDir)) / (float)Nf);
+            }
+
+            h_avgNeiAli.push_back(stats.avgNeighborsAli);
+            h_meanSpeed.push_back(stats.meanSpeed);
+            h_alignment.push_back(stats.alignmentPhi);
+            h_closeSep.push_back(stats.avgNeighborsSep);
+            h_cellOcc.push_back(stats.meanCellOcc);
 
             // 3) Apply and integrate positions
             for (int i = 0; i < (int)boids.size(); ++i)
@@ -489,9 +744,9 @@ int main() {
 
                 // Wrap boundaries
                 if (boids[i].pos.x < 0)
-                    boids[i].pos.x += W;
-                if (boids[i].pos.x >= W)
-                    boids[i].pos.x -= W;
+                    boids[i].pos.x += SIM_W;
+                if (boids[i].pos.x >= SIM_W)
+                    boids[i].pos.x -= SIM_W;
                 if (boids[i].pos.y < 0)
                     boids[i].pos.y += H;
                 if (boids[i].pos.y >= H)
@@ -504,8 +759,14 @@ int main() {
         glBufferData(GL_ARRAY_BUFFER, boids.size() * sizeof(Boid), boids.data(), GL_STREAM_DRAW);
 
         // ---- Draw ----
+
+        // Clear whole window first (including UI area background)
+        glViewport(0, 0, W, H);
         glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render boids ONLY in simulation viewport (left side)
+        glViewport(0, 0, SIM_W, H);
 
         shader.use();
         shader.setMat4("uVP", &vp[0][0]);
@@ -516,6 +777,10 @@ int main() {
         glDrawArraysInstanced(GL_TRIANGLES, 0, 3, (GLsizei)boids.size());
         glBindVertexArray(0);
 
+        // Restore full viewport for ImGui
+        glViewport(0, 0, W, H);
+
+        ImGuiLayer::EndFrame();
         glfwSwapBuffers(window);
     }
 
@@ -523,6 +788,7 @@ int main() {
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
 
+    ImGuiLayer::Shutdown();
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;

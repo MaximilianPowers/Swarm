@@ -1,38 +1,86 @@
 [
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\core\\Application.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\core\\Application.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\core\\Application.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\core\\Application.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/core/Application.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/core/Application.cpp.obj"
 },
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\graphics\\Renderer.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\graphics\\Renderer.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\graphics\\Renderer.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\graphics\\Renderer.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/graphics/Renderer.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/graphics/Renderer.cpp.obj"
 },
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\graphics\\Shader.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\graphics\\Shader.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\graphics\\Shader.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\graphics\\Shader.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/graphics/Shader.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/graphics/Shader.cpp.obj"
 },
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\main.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\main.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\main.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\main.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/main.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/main.cpp.obj"
 },
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\simulation\\Boid.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\simulation\\Boid.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\simulation\\Boid.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\simulation\\Boid.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/simulation/Boid.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/simulation/Boid.cpp.obj"
 },
 {
   "directory": "C:/Users/Max/Documents/Swarm/build",
-  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\simulation\\Flock.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\simulation\\Flock.cpp",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\simulation\\Flock.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\simulation\\Flock.cpp",
   "file": "C:/Users/Max/Documents/Swarm/src/simulation/Flock.cpp",
   "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/simulation/Flock.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\src\\ui\\ImGuiLayer.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\src\\ui\\ImGuiLayer.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/src/ui/ImGuiLayer.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/src/ui/ImGuiLayer.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\imgui.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\imgui.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/imgui.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/imgui.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\imgui_draw.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\imgui_draw.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/imgui_draw.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/imgui_draw.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\imgui_tables.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\imgui_tables.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/imgui_tables.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/imgui_tables.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\imgui_widgets.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\imgui_widgets.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/imgui_widgets.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/imgui_widgets.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\imgui_demo.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\imgui_demo.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/imgui_demo.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/imgui_demo.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\backends\\imgui_impl_glfw.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends\\imgui_impl_glfw.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/backends/imgui_impl_glfw.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/backends/imgui_impl_glfw.cpp.obj"
+},
+{
+  "directory": "C:/Users/Max/Documents/Swarm/build",
+  "command": "C:\\PROGRA~2\\MICROS~3\\2022\\BUILDT~1\\VC\\Tools\\MSVC\\1442~1.344\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DGLFW_DLL -IC:\\Users\\Max\\Documents\\Swarm\\src -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui -IC:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends -external:IC:\\Users\\Max\\Documents\\Swarm\\build\\vcpkg_installed\\x64-windows\\include -external:W0 /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /FoCMakeFiles\\Swarm.dir\\external\\imgui\\backends\\imgui_impl_opengl3.cpp.obj /FdCMakeFiles\\Swarm.dir\\ /FS -c C:\\Users\\Max\\Documents\\Swarm\\external\\imgui\\backends\\imgui_impl_opengl3.cpp",
+  "file": "C:/Users/Max/Documents/Swarm/external/imgui/backends/imgui_impl_opengl3.cpp",
+  "output": "C:/Users/Max/Documents/Swarm/build/CMakeFiles/Swarm.dir/external/imgui/backends/imgui_impl_opengl3.cpp.obj"
 }
 ]

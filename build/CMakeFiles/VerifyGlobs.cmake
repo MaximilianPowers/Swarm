@@ -10,6 +10,7 @@ set(OLD_GLOB
   "C:/Users/Max/Documents/Swarm/src/main.cpp"
   "C:/Users/Max/Documents/Swarm/src/simulation/Boid.cpp"
   "C:/Users/Max/Documents/Swarm/src/simulation/Flock.cpp"
+  "C:/Users/Max/Documents/Swarm/src/ui/ImGuiLayer.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

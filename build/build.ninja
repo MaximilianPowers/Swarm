@@ -53,7 +53,7 @@ build CMakeFiles\Swarm.dir\src\core\Application.cpp.obj: CXX_COMPILER__Swarm_uns
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\core
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
@@ -64,7 +64,7 @@ build CMakeFiles\Swarm.dir\src\graphics\Renderer.cpp.obj: CXX_COMPILER__Swarm_un
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\graphics
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
@@ -75,7 +75,7 @@ build CMakeFiles\Swarm.dir\src\graphics\Shader.cpp.obj: CXX_COMPILER__Swarm_unsc
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\graphics
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
@@ -86,7 +86,7 @@ build CMakeFiles\Swarm.dir\src\main.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
@@ -97,7 +97,7 @@ build CMakeFiles\Swarm.dir\src\simulation\Boid.cpp.obj: CXX_COMPILER__Swarm_unsc
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\simulation
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
@@ -108,9 +108,97 @@ build CMakeFiles\Swarm.dir\src\simulation\Flock.cpp.obj: CXX_COMPILER__Swarm_uns
   CONFIG = Debug
   DEFINES = -DGLFW_DLL
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
-  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
   OBJECT_DIR = CMakeFiles\Swarm.dir
   OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\simulation
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\src\ui\ImGuiLayer.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\src\ui\ImGuiLayer.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\src\ui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\imgui.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\imgui.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\imgui_draw.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\imgui_draw.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\imgui_tables.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\imgui_tables.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\imgui_widgets.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\imgui_demo.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\imgui_demo.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\backends\imgui_impl_glfw.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\backends\imgui_impl_glfw.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui\backends
+  TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
+  TARGET_PDB = Swarm.pdb
+  TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
+
+build CMakeFiles\Swarm.dir\external\imgui\backends\imgui_impl_opengl3.cpp.obj: CXX_COMPILER__Swarm_unscanned_Debug C$:\Users\Max\Documents\Swarm\external\imgui\backends\imgui_impl_opengl3.cpp || cmake_object_order_depends_target_Swarm
+  CONFIG = Debug
+  DEFINES = -DGLFW_DLL
+  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd
+  INCLUDES = -IC:\Users\Max\Documents\Swarm\src -IC:\Users\Max\Documents\Swarm\external\imgui -IC:\Users\Max\Documents\Swarm\external\imgui\backends -external:IC:\Users\Max\Documents\Swarm\build\vcpkg_installed\x64-windows\include -external:W0
+  OBJECT_DIR = CMakeFiles\Swarm.dir
+  OBJECT_FILE_DIR = CMakeFiles\Swarm.dir\external\imgui\backends
   TARGET_COMPILE_PDB = CMakeFiles\Swarm.dir\
   TARGET_PDB = Swarm.pdb
   TARGET_SUPPORT_DIR = CMakeFiles\Swarm.dir
@@ -123,7 +211,7 @@ build CMakeFiles\Swarm.dir\src\simulation\Flock.cpp.obj: CXX_COMPILER__Swarm_uns
 #############################################
 # Link the executable Swarm.exe
 
-build Swarm.exe: CXX_EXECUTABLE_LINKER__Swarm_Debug CMakeFiles\Swarm.dir\src\core\Application.cpp.obj CMakeFiles\Swarm.dir\src\graphics\Renderer.cpp.obj CMakeFiles\Swarm.dir\src\graphics\Shader.cpp.obj CMakeFiles\Swarm.dir\src\main.cpp.obj CMakeFiles\Swarm.dir\src\simulation\Boid.cpp.obj CMakeFiles\Swarm.dir\src\simulation\Flock.cpp.obj | vcpkg_installed\x64-windows\debug\lib\glfw3dll.lib vcpkg_installed\x64-windows\debug\lib\glad.lib vcpkg_installed\x64-windows\debug\lib\glm.lib
+build Swarm.exe: CXX_EXECUTABLE_LINKER__Swarm_Debug CMakeFiles\Swarm.dir\src\core\Application.cpp.obj CMakeFiles\Swarm.dir\src\graphics\Renderer.cpp.obj CMakeFiles\Swarm.dir\src\graphics\Shader.cpp.obj CMakeFiles\Swarm.dir\src\main.cpp.obj CMakeFiles\Swarm.dir\src\simulation\Boid.cpp.obj CMakeFiles\Swarm.dir\src\simulation\Flock.cpp.obj CMakeFiles\Swarm.dir\src\ui\ImGuiLayer.cpp.obj CMakeFiles\Swarm.dir\external\imgui\imgui.cpp.obj CMakeFiles\Swarm.dir\external\imgui\imgui_draw.cpp.obj CMakeFiles\Swarm.dir\external\imgui\imgui_tables.cpp.obj CMakeFiles\Swarm.dir\external\imgui\imgui_widgets.cpp.obj CMakeFiles\Swarm.dir\external\imgui\imgui_demo.cpp.obj CMakeFiles\Swarm.dir\external\imgui\backends\imgui_impl_glfw.cpp.obj CMakeFiles\Swarm.dir\external\imgui\backends\imgui_impl_opengl3.cpp.obj | vcpkg_installed\x64-windows\debug\lib\glfw3dll.lib vcpkg_installed\x64-windows\debug\lib\glad.lib vcpkg_installed\x64-windows\debug\lib\glm.lib
   CONFIG = Debug
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
